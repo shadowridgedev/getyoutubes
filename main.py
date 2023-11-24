@@ -6,7 +6,7 @@ from multiprocessing import Pool
 import mysql.connector
 import re
 
-## broken
+## broken again
 def sanitize_filename(title):
     # Replace invalid file name characters with an underscore
     return re.sub(r'[\\/:*?"<>|\|\t\n\r]', "_", title)
