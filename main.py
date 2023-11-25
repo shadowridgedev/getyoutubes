@@ -2,7 +2,7 @@ import sys
 import os
 import re
 import moviepy.editor as mp
-import speechrecognition as sr
+import speech_recognition as sr
 from pytube import YouTube
 from multiprocessing import Pool
 import mysql.connector
@@ -123,7 +123,7 @@ def read_urls_from_file(file_path):
 
 # Main function
 def main():
-    youtube_urls_file = adjust_for_os("path_to_your_file.txt")  # Replace with your file path
+    youtube_urls_file = adjust_for_os("transcript.txt")  # Replace with your file path
     youtube_urls = read_urls_from_file(youtube_urls_file)
 
     download_path = adjust_for_os("E:/scratch")  # Replace with your download path
@@ -132,8 +132,8 @@ def main():
         'host': 'localhost',
         'port': 4306,
         'user': 'newuser',
-        'password': 'Rs232x25',
-        'database': 'getyoutubevideos'
+        'password': 'Rs232x25##',
+        'database': 'youtube'
     }
 
     create_database_and_table(db_config)
