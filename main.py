@@ -1,10 +1,11 @@
 import moviepy.editor as mp
-import speech_recognition as sr
+import speechrecognition as sr
 import os
 from pytube import YouTube
 from multiprocessing import Pool
 import mysql.connector
 import re
+
 
 ## broken again and again
 def sanitize_filename(title):
@@ -78,9 +79,9 @@ def create_database_and_table(db_config):
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS youtube")
-    cursor.execute("USE youtube")
+    cursor.execute("USE getyoutubevideos")
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS YoutubeData (
+        CREATE TABLE IF NOT EXISTS youtubevideos (
             id INT AUTO_INCREMENT PRIMARY KEY,
             video_url TEXT,
             video_path TEXT,
@@ -106,7 +107,6 @@ def store_data(db_config, video_url, video_path, audio_path, transcript):
     conn.close()
 
 
-
 def main():
     video_url = "https://www.youtube.com/watch?v=LJA5BQLC9Ds"
     download_path = "E:/scratch"  # Define the download path
@@ -118,9 +118,9 @@ def main():
 
     db_config = {
         'host': 'localhost',
-        'user': 'root',
-        'password': '',
-        'database': 'youtube'
+        'user': 'newuser',
+        'password': 'Rs232x25',
+        'database': 'getyoutubevideos'
     }
 
     video_path = download_video(video_url, download_path)
