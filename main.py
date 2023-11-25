@@ -2,18 +2,21 @@ import sys
 import os
 import re
 import moviepy.editor as mp
-import speech_recognition as sr
+import speechrecognition as sr
 from pytube import YouTube
 from multiprocessing import Pool
 import mysql.connector
+
 
 # Function to adjust file paths for different operating systems
 def adjust_for_os(path):
     return path.replace('/', os.sep) if os.name == 'nt' else path
 
+
 # Function to sanitize filenames
 def sanitize_filename(title):
     return re.sub(r'[\\/:*?"<>|\|\t\n\r]', "_", title)
+
 
 # Function to download videos from YouTube
 def download_video(video_url, download_path):
@@ -26,6 +29,7 @@ def download_video(video_url, download_path):
     print("Video downloaded successfully.")
     return os.path.join(download_path, file_name)
 
+
 # Function to extract audio from video
 def extract_audio(video_path, download_path):
     print(f"Extracting audio from {video_path}")
@@ -37,6 +41,7 @@ def extract_audio(video_path, download_path):
     audio_clip.close()
     print("Audio extracted successfully.")
     return audio_full_path
+
 
 # Function to transcribe audio
 def transcribe_audio(segment):
@@ -56,6 +61,7 @@ def transcribe_audio(segment):
             print(f"Error in speech recognition: {e}")
             return f"[Error: {e}]"
 
+
 # Function to handle missing words in transcriptions
 def handle_missing_words(full_transcriptions, three_second_transcriptions, overlap):
     corrected_transcripts = []
@@ -72,6 +78,7 @@ def handle_missing_words(full_transcriptions, three_second_transcriptions, overl
         corrected_transcripts.append(corrected_segment)
     corrected_transcripts.append(full_transcriptions[-1])  # Append the last segment without modification
     return corrected_transcripts
+
 
 # Function to create a database and table
 def create_database_and_table(db_config):
@@ -92,6 +99,7 @@ def create_database_and_table(db_config):
     cursor.close()
     conn.close()
 
+
 # Function to store data in database
 def store_data(db_config, video_url, video_path, audio_path, transcript):
     conn = mysql.connector.connect(**db_config)
@@ -105,11 +113,13 @@ def store_data(db_config, video_url, video_path, audio_path, transcript):
     cursor.close()
     conn.close()
 
+
 # Function to read YouTube URLs from a file
 def read_urls_from_file(file_path):
     with open(file_path, 'r') as file:
         urls = file.read().splitlines()
     return urls
+
 
 # Main function
 def main():
@@ -137,8 +147,10 @@ def main():
             overlap = 3
             total_duration = mp.VideoFileClip(video_path).duration
 
-            full_segments = [(audio_full_path, i * segment_duration, segment_duration + overlap) for i in range(int(total_duration / segment_duration))]
-            three_second_segments = [(audio_full_path, i * segment_duration, overlap) for i in range(1, int(total_duration / segment_duration))]
+            full_segments = [(audio_full_path, i * segment_duration, segment_duration + overlap) for i in
+                             range(int(total_duration / segment_duration))]
+            three_second_segments = [(audio_full_path, i * segment_duration, overlap) for i in
+                                     range(1, int(total_duration / segment_duration))]
 
             with Pool() as pool:
                 full_transcriptions = pool.map(transcribe_audio, full_segments)
@@ -150,6 +162,7 @@ def main():
             store_data(db_config, video_url, video_path, audio_full_path, full_transcript)
         except Exception as e:
             print(f"Error processing {video_url}: {e}")
+
 
 if __name__ == "__main__":
     main()
