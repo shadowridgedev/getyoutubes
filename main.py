@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import mysql.connector
 
 
-# Function to adjust file paths for different operating systems
+## Function to adjust file paths for different operating systems
 def adjust_for_os(path):
     return path.replace('/', os.sep) if os.name == 'nt' else path
 
