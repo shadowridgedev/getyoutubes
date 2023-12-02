@@ -128,13 +128,17 @@ def main():
 
     download_path = adjust_for_os("E:/scratch")  # Replace with your download path
 
+
     db_config = {
-        'host': 'localhost',
-        'port': 4306,
-        'user': 'newuser',
-        'password': 'Rs232x25##',
-        'database': 'youtube'
-    }
+            'host': os.environ.get('host', 'localhost'),
+            # Replace 'default_host' with a default value or leave as is
+            'port': int(os.environ.get('port', 3306)),  # Default MySQL port is 3306
+            'user': os.environ.get('user'),
+            'password': os.environ.get('password'),
+            'database': os.environ.get('database', 'youtube')
+        }
+
+        # ... [rest of your code] ...
 
     create_database_and_table(db_config)
 
