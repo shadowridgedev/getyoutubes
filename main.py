@@ -1,13 +1,15 @@
 import os
 import re
 import moviepy.editor as mp
-import speech_recognition as sr
+import SpeechRecognition as sr
 from multiprocessing import Pool
 import mysql.connector
+
 
 # Function to sanitize filenames
 def sanitize_filename(title):
     return re.sub(r'[\\/:*?"<>|\|\t\n\r]', "_", title)
+
 
 # Function to extract audio from video (if it's a video file)
 def extract_audio(video_path, download_path):
@@ -23,6 +25,7 @@ def extract_audio(video_path, download_path):
         return audio_full_path
     else:
         return None  # Not a video file, return None
+
 
 # Function to transcribe audio
 def transcribe_audio(segment):
@@ -42,6 +45,7 @@ def transcribe_audio(segment):
             print(f"Error in speech recognition: {e}")
             return f"[Error: {e}]"
 
+
 # Function to handle missing words in transcriptions
 def handle_missing_words(full_transcriptions, three_second_transcriptions, overlap):
     corrected_transcripts = []
@@ -58,6 +62,7 @@ def handle_missing_words(full_transcriptions, three_second_transcriptions, overl
         corrected_transcripts.append(corrected_segment)
     corrected_transcripts.append(full_transcriptions[-1])  # Append the last segment without modification
     return corrected_transcripts
+
 
 # Function to create a database and table
 def create_database_and_table(db_config):
@@ -78,6 +83,7 @@ def create_database_and_table(db_config):
     cursor.close()
     conn.close()
 
+
 # Function to store data in database
 def store_data(db_config, file_name, file_path, audio_path, transcript):
     conn = mysql.connector.connect(**db_config)
@@ -91,6 +97,7 @@ def store_data(db_config, file_name, file_path, audio_path, transcript):
     cursor.close()
     conn.close()
 
+
 # Function to process files in a directory
 def process_files(directory):
     for filename in os.listdir(directory):
@@ -103,9 +110,9 @@ def process_files(directory):
                 total_duration = mp.VideoFileClip(filepath).duration
 
                 full_segments = [(audio_path, i * segment_duration, segment_duration + overlap) for i in
-                                range(int(total_duration / segment_duration))]
+                                 range(int(total_duration / segment_duration))]
                 three_second_segments = [(audio_path, i * segment_duration, overlap) for i in
-                                        range(1, int(total_duration / segment_duration))]
+                                         range(1, int(total_duration / segment_duration))]
 
                 with Pool() as pool:
                     full_transcriptions = pool.map(transcribe_audio, full_segments)
@@ -134,4 +141,3 @@ if __name__ == "__main__":
 
     create_database_and_table(db_config)
     process_files(directory_to_scan)
-
